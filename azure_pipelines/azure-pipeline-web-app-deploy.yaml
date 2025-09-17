@@ -1,0 +1,51 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: BuildAndTest
+  displayName: 'Build & Test (CI)'
+  jobs:
+  - job: BuildTest
+    displayName: 'Build, Test, and Docker Compose Build'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '20.x'
+      displayName: 'Use Node.js 20'
+
+    - script: yarn install --frozen-lockfile
+      displayName: 'Install Dependencies'
+
+    - script: yarn lint
+      displayName: 'Run Lint'
+      
+    - script: yarn build
+      displayName: 'Build App'
+
+    - script: yarn test --watchAll=false
+      displayName: 'Run Automated Tests'
+
+    - task: DockerCompose@0
+      displayName: 'Build Docker Compose services'
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerComposeFile: '**/docker-compose.yml'
+        action: 'Build services'
+
+- stage: Deploy
+  displayName: 'Deploy (CD)'
+  dependsOn: BuildAndTest
+  condition: succeeded()
+  jobs:
+  - deployment: DeployApp
+    displayName: 'Deploy to Production'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: docker-compose -f docker-compose.yml up -d --remove-orphans
+            displayName: 'Deploy Docker Compose App'
