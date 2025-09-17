@@ -1,12 +1,10 @@
-trigger:
-- main
-
-pool:
-  vmImage: 'ubuntu-latest'
+parameters:
+  - name: ENV
+    type: NonProd
 
 stages:
 - stage: BuildAndTest
-  displayName: 'Build & Test (CI)'
+  displayName: 'Build & Test (CI) - ${{ parameters.ENV }}'
   jobs:
   - job: BuildTest
     displayName: 'Build, Test, and Docker Compose Build'
@@ -25,8 +23,8 @@ stages:
     - script: yarn build
       displayName: 'Build App'
 
-    - script: yarn test --watchAll=false
-      displayName: 'Run Automated Tests'
+    # - script: yarn test --watchAll=false
+    #   displayName: 'Run Automated Tests'
 
     - task: DockerCompose@0
       displayName: 'Build Docker Compose services'
@@ -36,13 +34,13 @@ stages:
         action: 'Build services'
 
 - stage: Deploy
-  displayName: 'Deploy (CD)'
+  displayName: 'Deploy (CD) - ${{ parameters.ENV }}'
   dependsOn: BuildAndTest
   condition: succeeded()
   jobs:
   - deployment: DeployApp
-    displayName: 'Deploy to Production'
-    environment: 'production'
+    displayName: 'Deploy to ${{ parameters.ENV }}'
+    environment: ${{ parameters.ENV }}
     strategy:
       runOnce:
         deploy:

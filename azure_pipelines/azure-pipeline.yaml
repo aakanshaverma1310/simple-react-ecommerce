@@ -1,0 +1,32 @@
+trigger: none
+
+parameters:
+- name: ENV
+  displayName: Select environment to deploy to
+  type: string
+  default: NonProd
+  values:
+  - NonProd
+  - Prod
+  
+variables:
+    - ${{ if eq(parameters.ENV, 'NonProd') }}:
+        - group: nonprod
+    - ${{ if eq(parameters.ENV, 'Prod') }}:
+        - group: prod
+
+    - name: myserivceConn
+      ${{ if eq(parameters.ENV, 'Dev') }}:
+        value: 'Service-Conn-Nonprod'
+      ${{ if eq(parameters.ENV, 'Prod') }}:
+        value: 'Service-Conn-Prod'
+pool:
+  name: 'ADO-Agentpool'
+
+stages:
+- template: azure-pipeline-template.yaml
+  parameters:
+    ENV: '${{ parameters.ENV }}'
+
+
+
