@@ -1,6 +1,6 @@
 parameters:
   - name: ENV
-    type: NonProd
+    default: NonProd
 
 stages:
 - stage: BuildAndTest
