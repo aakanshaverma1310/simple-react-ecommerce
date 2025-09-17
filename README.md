@@ -1,52 +1,89 @@
-# Shopify - a simple eCommerce app
+# Simple React Ecommerce
 
-Welcome to my E-commerce App! This project is a dummy e-commerce application built using React, Tailwind CSS, Vite, TypeScript, and Redux Toolkit. It aims to showcase various features commonly found in e-commerce platforms, including a homepage, product listing page, cart functionality, and user-authenticated pages like account and wishlist.
+This project is a simple React-based ecommerce application, containerized with Docker and orchestrated using Docker Compose. CI/CD automation is handled via an Azure Pipeline YAML template.
 
-## Features
+---
 
-- **Homepage:** Introduce users to your e-commerce platform with attractive banners, featured products, and navigation options.
-- **Product Page:** Display a catalog of products with detailed information, including images, descriptions, and pricing.
-- **Cart:** Allow users to add products to their cart, view cart contents, and proceed to checkout.
-- **User Authentication:** Enable users to create accounts, log in, and access personalized features like wishlists and account settings.
-- **Wishlist:** Allow users to save products they're interested in for future reference.
+## 🚀 Docker
 
-## Technologies Used
+### Build the Docker Image
 
-- **React:** A popular JavaScript library for building user interfaces.
-- **Tailwind CSS:** A utility-first CSS framework for building custom designs quickly.
-- **Vite:** A modern build tool that serves your code via native ES Module imports during development for faster performance.
-- **TypeScript:** A statically typed superset of JavaScript that enhances code quality and developer productivity.
-- **Redux Toolkit:** A simplified state management library for managing application state efficiently.
-- **Cypress:** A next-generation front-end testing tool designed for the modern web.
+To build the Docker image for the app, run:
+```sh
+docker build -t simple-react-ecommerce .
+```
 
-## Getting Started
+### Run the Docker Container
 
-1. Clone this repository to your local machine.
-2. Install dependencies using `npm install` or `yarn install`.
-3. Start the development server using `npm run dev` or `yarn dev`.
-4. Open your browser and navigate to `http://localhost:5173` to view the application.
+To run the container and expose it on your local machine:
+```sh
+docker run -p 5173:5173 simple-react-ecommerce
+```
+Your app will be available at [http://localhost:5173](http://localhost:5173).
 
-## Contributing
+---
 
-Contributions are welcome! If you'd like to contribute to this project, please follow these steps:
+## 🐳 Docker Compose
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/your-feature-name`).
-3. Make your changes and commit them (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature/your-feature-name`).
-5. Open a pull request.
+The `docker-compose.yml` file allows you to easily build and run the app as a service:
 
-## License
+```yaml
+version: '3.8'
 
-This project is licensed under the [MIT License](LICENSE).
+services:
+  social-site-demo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+```
 
-## Acknowledgements
+To start the service:
+```sh
+docker-compose up --build
+```
 
-- Since this is a frontend only project, all the data have been collected from [DummyJSON](https://dummyjson.com/).
-- Special thanks to [Tailwind Labs](https://tailwindcss.com/) and [Redux Toolkit](https://redux-toolkit.js.org/) for their amazing tools and documentation.
+To stop the service:
+```sh
+docker-compose down
+```
 
-## Contact
+---
 
-For any inquiries or feedback, feel free to contact [me](mailto:alim1496@gmail.com).
+## ⚙️ Azure Pipeline
 
-Happy coding! 🚀
+The Azure Pipeline YAML template (`azure_pipelines/azure-pipeline-template.yaml`) automates build, test, and deployment:
+
+- **Build & Test Stage:**  
+  - Installs dependencies  
+  - Runs lint and build steps  
+  - Optionally runs tests  
+  - Builds Docker Compose services
+
+- **Deploy Stage:**  
+  - Deploys the app using Docker Compose
+
+### Usage
+
+Reference the pipeline template in your Azure DevOps pipeline configuration.  
+Customize the `ENV` parameter for different environments (e.g., NonProd, Prod).
+
+---
+
+## 📁 Key Files
+
+- `Dockerfile` — Containerizes the React app using Node.js and Nginx.
+- `docker-compose.yml` — Orchestrates the app as a service.
+- `azure_pipelines/azure-pipeline-template.yaml` — Defines CI/CD stages for Azure DevOps.
+
+---
+
+## 📝 Notes
+
+- Ensure your build output directory matches the Dockerfile (`dist` for Vite, `build` for Create React App).
+- Update ports and service names in `docker-compose.yml` as needed.
+- The pipeline template can be extended for additional steps (e.g., automated tests).
+
+---
