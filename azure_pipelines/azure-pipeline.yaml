@@ -10,11 +10,6 @@ parameters:
   - Prod
   
 variables:
-    - ${{ if eq(parameters.ENV, 'NonProd') }}:
-        - group: nonprod
-    - ${{ if eq(parameters.ENV, 'Prod') }}:
-        - group: prod
-
     - name: myserivceConn
       ${{ if eq(parameters.ENV, 'Dev') }}:
         value: 'Service-Conn-Nonprod'
