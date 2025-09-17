@@ -16,7 +16,7 @@ variables:
       ${{ if eq(parameters.ENV, 'Prod') }}:
         value: 'Service-Conn-Prod'
 pool:
-  name: 'ADO-Agentpool'
+  vmImage: 'ubuntu-latest'
 
 stages:
 - template: azure-pipeline-template.yaml
